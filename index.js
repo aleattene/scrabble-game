@@ -36,3 +36,16 @@ for (let i = 1; i<=8; i++) {
 
 console.log(hand)   // debug
 console.log(available_letters.length)  // debug
+
+
+// let word = prompt('Enter a word: ');
+
+
+function calculateScore(word) {
+    let points = 0;
+    for (let i = 0; i < word.length; i++) {
+        let character = word[i];
+        points += pointLetters[character.toUpperCase()];
+    }
+    return points;
+}
