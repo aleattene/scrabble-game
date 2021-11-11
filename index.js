@@ -49,3 +49,29 @@ function calculateScore(word) {
     }
     return points;
 }
+
+
+// File reading
+fs.readFile('./it_words_allowed_scrabble_test.txt', 'utf8',
+    function (err, data) {
+        // Error checking
+        if (err) {
+            return console.log(err);
+        }
+        // Successful file reading
+        const array = data.split("\n");
+        // console.log(array)
+        array.map((item) => {
+            item = item.toUpperCase()
+            if (item.length <= hand.length) {
+                let letters = [...item]
+                let check = letters.every(function (element) {
+                    return hand.includes(element);
+                });
+                if (check) {
+                    console.log(item)
+                    console.log(calculateScore(item))
+                }
+            }
+        });
+    });
