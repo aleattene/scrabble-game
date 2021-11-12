@@ -20,22 +20,22 @@ for (let i of alphabet) {
         available_letters.push(Object.keys(i))}
 }
 
-console.log(available_letters)  // debug
-console.log(available_letters.length)  // debug
+// console.log(available_letters)  // debug
+// console.log(available_letters.length)  // debug
 
 
-let hand = ["A", "B", "B", "A", "G", "L", "I", "A"]  // debug
-
-/*let hand = [];
+// let hand = ["A", "B", "B", "A", "G", "L", "I", "A"]  // debug
+let hand = [];
 
 for (let i = 1; i<=8; i++) {
     let tmp = available_letters[Math.floor(Math.random() * available_letters.length)]
     hand.push(available_letters.splice(available_letters.indexOf(tmp), 1)[0][0]);
 }
-*/
+let handScore = calculateScore(hand)
+console.log(handScore)
 
 console.log(hand)   // debug
-console.log(available_letters.length)  // debug
+// console.log(available_letters.length)  // debug
 
 
 // let word = prompt('Enter a word: ');
@@ -50,9 +50,8 @@ function calculateScore(word) {
     return points;
 }
 
-
 // File reading
-fs.readFile('./it_words_allowed_scrabble_test.txt', 'utf8',
+fs.readFile('./it_words_allowed_scrabble.txt', 'utf8',
     function (err, data) {
         // Error checking
         if (err) {
@@ -61,17 +60,36 @@ fs.readFile('./it_words_allowed_scrabble_test.txt', 'utf8',
         // Successful file reading
         const array = data.split("\n");
         // console.log(array)
-        array.map((item) => {
-            item = item.toUpperCase()
+
+        let result = ["", 0]
+        let i = 0
+        while( i < array.length) {
+            let item = array[i].toUpperCase()
             if (item.length <= hand.length) {
                 let letters = [...item]
+                // Fix THIS BUG
                 let check = letters.every(function (element) {
                     return hand.includes(element);
                 });
+                // ============
                 if (check) {
-                    console.log(item)
-                    console.log(calculateScore(item))
+                    // console.log(item)
+                    let score = calculateScore(item);
+                    let score2 = result[1]
+                    if (score === handScore) {
+                        result[0] = item
+                        result[1] = score
+                        console.log(item)
+                        console.log(score)
+                        break;
+                    } else if (score > score2 && score <= handScore){
+                        result[0] = item;
+                        result[1] = score;
+                    }
                 }
             }
-        });
-    });
+        i ++;
+        }
+        console.log(result[0])
+        console.log(result[1])
+});
