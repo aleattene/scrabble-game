@@ -15,18 +15,24 @@ const pointLetters = {'A': 1, 'B': 5, 'C': 2, 'D': 5, 'E': 1, 'F': 5, 'G': 8, 'H
 // Creation of the object containing all the available letters
 let available_letters = createAvailableLetters(alphabet);
 
-// console.log(available_letters)  // debug
-// console.log(available_letters.length)  // debug
+// console.log(available_letters)
+// console.log(available_letters.length)
 
-// let hand = ["A", "B", "B", "A", "G", "L", "I", "A"]  // debug
+// let hand = ["A", "B", "B", "A", "G", "L", "I", "A"]
 
 let hand = createHand(available_letters)
 let handScoreMax = calculateScore(hand)
 
-console.log(hand)   // debug
-console.log(handScoreMax) // debug
+console.log(hand)
+console.log(`Max Value = ${handScoreMax}`)
 
-// console.log(available_letters.length)  // debug
+let str = hand.sort().join("")
+
+let all_combinations = combinations(str)
+
+console.log(all_combinations)
+
+// console.log(available_letters.length)
 
 // let word = prompt('Enter a word: ');
 
@@ -39,43 +45,30 @@ fs.readFile('./it_words_allowed_scrabble.txt', 'utf8',
         }
         // Successful file reading
         const array = data.split("\n");
-        // console.log(array)  // debug
+        // console.log(array)
 
         let result = ["", 0]
         let i = 0
         while( i < array.length) {
             let item = array[i].toUpperCase()
-            if (item.length <= hand.length) {
-                let letters = [...item]
-                // Fix THIS BUG
-                let check = letters.every(function (element) {
-                    return hand.includes(element);
-                });
-                // ============
-                if (check) {
-                    // console.log(item)
-                    let score = calculateScore(item);
-                    let score2 = result[1]
-                    if (score === handScoreMax) { // for future -> >length is better ???
-                        result[0] = item
-                        result[1] = score
-                        console.log(item)
-                        console.log(score)
+            let check = isAllowed(item, hand)
+            if (check) {
+                let score = calculateScore(item);
+                let goal = checkBetterWord(item, score, result)
+                    if (goal) {
                         break;
-                    } else if (score > score2 && score <= handScoreMax){
-                        result[0] = item;
-                        result[1] = score;
                     }
                 }
-            }
-        i ++;
+            i++;
         }
         console.log(result[0])
         console.log(result[1])
 });
 
 
+
 // FUNCTIONS ==============================================================================
+
 
 function createAvailableLetters(alphabet) {
     let available_letters = [];
@@ -87,6 +80,7 @@ function createAvailableLetters(alphabet) {
     return available_letters
 }
 
+
 function createHand(available_letters) {
     let hand = [];
     for (let i = 1; i <= 8; i++) {
@@ -96,6 +90,7 @@ function createHand(available_letters) {
     return hand
 }
 
+
 function calculateScore(word) {
     let points = 0;
     for (let i = 0; i < word.length; i++) {
@@ -103,6 +98,49 @@ function calculateScore(word) {
         points += pointLetters[character.toUpperCase()];
     }
     return points;
+}
+
+
+function combinations(str) {
+    let fn = function(active, rest, a) {
+        if (!active && !rest)
+            return;
+        if (!rest) {
+            a.push(active);
+        } else {
+            fn(active + rest[0], rest.slice(1), a);
+            fn(active, rest.slice(1), a);
+        }
+        return a;
+    }
+    return fn("", str, []);
+}
+
+
+function isAllowed(item, hand) {
+    if (item.length <= hand.length) {
+        let letters = [...item].sort().join("")
+        let check = all_combinations.includes(letters)
+        return check;
+    }
+}
+
+
+function checkBetterWord(item, score, result){
+    // console.log(item)
+    let score2 = result[1]
+    if (score === handScoreMax) { // for future -> >length is better ???
+        result[0] = item
+        result[1] = score
+        // console.log(item)    // debug
+        // console.log(score);  // debug
+        return true;
+    }
+    else if (score > score2 && score <= handScoreMax){
+        result[0] = item;
+        result[1] = score;
+    }
+    return false;
 }
 
 // ==========================================================================================
